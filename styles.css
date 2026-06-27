@@ -25,7 +25,7 @@
   --tile-w: clamp(38px, 10.8vw, 48px);
   --tile-h: calc(var(--tile-w) * 1.92);
   --tile-half: calc(var(--tile-h) / 2);
-  --board-tile-w: clamp(18px, 3.6vw, 23px);
+  --board-tile-w: clamp(24px, 5.5vw, 30px);
   --board-tile-h: calc(var(--board-tile-w) * 1.92);
   --board-tile-half: calc(var(--board-tile-h) / 2);
   --safe-b: env(safe-area-inset-bottom, 0px);
@@ -695,7 +695,10 @@ body {
 
 .board-chain .domino {
   position: absolute;
-  animation: dropIn 0.28s cubic-bezier(0.2, 0.9, 0.3, 1.3);
+  animation: dropIn 0.28s cubic-bezier(0.2, 0.9, 0.3, 1.3) forwards;
+  opacity: 1;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 @keyframes dropIn {
@@ -969,15 +972,27 @@ body {
 .half .pip:nth-child(8) { left: 50%; top: 78%; }
 .half .pip:nth-child(9) { left: 78%; top: 78%; }
 
-/* Board tiles: slightly larger pips so they're readable at small size */
-.board-piece .pip {
-  width: 30%;
-}
-
-.board-piece {
+/* Board tiles: solid ivory background + larger pips (fixes mobile transparency) */
+.board-piece.domino {
   --domino-w: var(--board-tile-w);
   --domino-h: var(--board-tile-h);
   --domino-half: var(--board-tile-half);
+  background-color: #f5ecd8;
+  background-image: linear-gradient(180deg, #fdfaf2 0%, #e8dcc4 100%);
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    inset 0 0 0 1.5px #b6aa92;
+  opacity: 1;
+}
+
+.board-piece .pip {
+  width: 32%;
+  background: #141414;
+}
+
+.board-piece .half {
+  background: transparent;
 }
 
 .pip.hidden {
@@ -1177,6 +1192,34 @@ body {
   text-align: center;
   box-shadow: var(--shadow);
   animation: slideUp 0.2s ease;
+}
+
+/* Mobile: larger board tiles, stronger domino contrast */
+@media (max-width: 599px) {
+  :root {
+    --board-tile-w: clamp(28px, 7vw, 34px);
+    --tile-w: clamp(40px, 11vw, 50px);
+  }
+
+  .board-panel {
+    top: 58px;
+    left: 0.5%;
+    right: 0.5%;
+    bottom: 8%;
+    padding: 8px;
+  }
+
+  .board-scroll {
+    padding: 6px;
+  }
+
+  .board-piece .pip {
+    width: 34%;
+  }
+
+  .domino::after {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.22), transparent 40%);
+  }
 }
 
 /* On bigger screens, center everything as a clean phone-like column
