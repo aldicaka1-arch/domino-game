@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#0d2b20">
+  <title>Domino 2v2</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Lobby -->
+  <section class="screen screen-lobby" id="screen-lobby">
+    <div class="lobby-card">
+      <div class="logo">◫</div>
+      <h1>Domino 2v2</h1>
+      <p class="tagline">4 HP · 1 ruangan · tim 2 lawan 2</p>
+
+      <label class="field">
+        <span>Nama Anda</span>
+        <input id="input-name" type="text" maxlength="20" placeholder="Contoh: Aldi" autocomplete="nickname">
+      </label>
+
+      <button class="btn btn-primary btn-block" id="btn-solo" type="button">🤖 Main Sendiri (vs 3 Bot)</button>
+
+      <div class="divider"><span>atau multiplayer</span></div>
+
+      <button class="btn btn-secondary btn-block" id="btn-create" type="button">Buat Ruangan</button>
+
+      <div class="divider"><span>atau gabung</span></div>
+
+      <label class="field">
+        <span>Kode Ruangan</span>
+        <input id="input-code" type="text" maxlength="4" inputmode="numeric" pattern="[0-9]*" placeholder="1234">
+      </label>
+
+      <button class="btn btn-secondary btn-block" id="btn-join" type="button">Gabung Ruangan</button>
+      <p class="error-msg" id="lobby-error" hidden></p>
+
+      <footer class="lobby-tip">
+        Semua pemain harus terhubung ke WiFi yang sama.<br>
+        Host jalankan: <code>npm start</code> lalu buka IP komputer di HP.
+      </footer>
+    </div>
+  </section>
+
+  <!-- Waiting room -->
+  <section class="screen screen-waiting hidden" id="screen-waiting">
+    <header class="top-bar">
+      <div>
+        <p class="label">Kode Ruangan</p>
+        <p class="room-code" id="display-code">----</p>
+      </div>
+      <div class="scores-mini">
+        <span class="team-a-chip">A: <strong id="wait-score-a">0</strong></span>
+        <span class="team-b-chip">B: <strong id="wait-score-b">0</strong></span>
+      </div>
+    </header>
+
+    <div class="waiting-body">
+      <h2>Pemain (<span id="player-count">1</span>/4)</h2>
+      <ul class="player-list" id="player-list"></ul>
+      <p class="hint" id="waiting-hint">Bagikan kode ruangan ke 3 pemain lain.</p>
+      <button class="btn btn-primary btn-block" id="btn-start" type="button" disabled>Mulai Permainan</button>
+      <button class="btn btn-ghost btn-block" id="btn-leave" type="button">Keluar</button>
+    </div>
+
+    <button class="chat-fab" id="chat-fab-wait" type="button" aria-label="Chat">💬</button>
+    <aside class="chat-drawer" id="chat-drawer-wait" hidden>
+      <div class="chat-header">
+        <span>Chat Ruangan</span>
+        <button class="chat-close" type="button" data-close="chat-drawer-wait">✕</button>
+      </div>
+      <div class="chat-messages" id="chat-messages-wait"></div>
+      <form class="chat-form" id="chat-form-wait">
+        <input type="text" maxlength="120" placeholder="Ketik pesan…" autocomplete="off">
+        <button type="submit" class="btn btn-primary">Kirim</button>
+      </form>
+    </aside>
+  </section>
+
+  <!-- Game -->
+  <section class="screen screen-game hidden" id="screen-game">
+    <div class="topbar">
+      <div class="tb-score a"><span>TIM A</span><strong id="score-a">0</strong></div>
+      <div class="tb-info">
+        <span class="tb-hand">Hand <strong id="hand-num">1</strong></span>
+        <span class="room-tag" id="game-room-code">0000</span>
+      </div>
+      <div class="tb-score b"><span>TIM B</span><strong id="score-b">0</strong></div>
+      <button class="icon-btn" id="btn-leave-game" type="button" aria-label="Keluar">⚙</button>
+    </div>
+
+    <div class="table-area">
+      <div class="board-panel" id="board-panel">
+        <div class="felt-inner">
+          <div class="end-chip left"><span>KIRI</span><strong id="end-left">—</strong></div>
+          <div class="end-chip right"><span>KANAN</span><strong id="end-right">—</strong></div>
+          <div class="board-scroll" id="board-scroll">
+            <div class="board-chain" id="board-chain"></div>
+          </div>
+          <div class="drop-zones" id="drop-zones" aria-hidden="true">
+            <div class="drop-zone left" id="drop-left">◄ KIRI</div>
+            <div class="drop-zone right" id="drop-right">KANAN ►</div>
+          </div>
+          <p class="game-msg" id="game-msg"></p>
+        </div>
+      </div>
+
+      <div class="seat pos-left" id="seat-left"></div>
+      <div class="seat pos-mid" id="seat-mid"></div>
+      <div class="seat pos-right" id="seat-right"></div>
+      <div class="seat pos-you" id="seat-you"></div>
+
+      <button class="chat-fab" id="chat-fab-game" type="button" aria-label="Chat">💬</button>
+    </div>
+
+    <div class="hand-dock">
+      <p class="turn-line" id="turn-line">Menunggu…</p>
+      <div class="hand-scroll" id="my-hand"></div>
+      <div class="action-bar" id="action-bar">
+        <button class="btn btn-secondary" id="btn-pass" type="button" disabled>Lewati</button>
+        <button class="btn btn-gold" id="btn-play-left" type="button" disabled>◄ Kiri <span id="btn-left-num"></span></button>
+        <button class="btn btn-gold" id="btn-play-right" type="button" disabled>Kanan <span id="btn-right-num"></span> ►</button>
+      </div>
+    </div>
+    <span id="my-count" hidden></span>
+    <span id="drag-hint" hidden></span>
+    <aside class="chat-drawer" id="chat-drawer-game" hidden>
+      <div class="chat-header">
+        <span>Chat</span>
+        <button class="chat-close" type="button" data-close="chat-drawer-game">✕</button>
+      </div>
+      <div class="chat-messages" id="chat-messages-game"></div>
+      <form class="chat-form" id="chat-form-game">
+        <input type="text" maxlength="120" placeholder="Ketik pesan…" autocomplete="off">
+        <button type="submit" class="btn btn-primary">Kirim</button>
+      </form>
+    </aside>
+  </section>
+
+  <dialog class="modal" id="modal-round">
+    <div class="modal-box">
+      <h2 id="modal-round-title">Hand Selesai</h2>
+      <p id="modal-round-body"></p>
+      <ul id="modal-round-list"></ul>
+      <button class="btn btn-primary btn-block" id="btn-next-hand" type="button" hidden>Hand Berikutnya</button>
+      <p class="modal-note" id="modal-host-note" hidden>Hanya host yang bisa lanjut.</p>
+    </div>
+  </dialog>
+
+  <dialog class="modal" id="modal-win">
+    <div class="modal-box">
+      <h2 id="modal-win-title">Menang!</h2>
+      <p id="modal-win-body"></p>
+      <button class="btn btn-primary btn-block" id="btn-new-match" type="button">Main Lagi</button>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast" hidden></div>
+
+  <script src="client.js"></script>
+</body>
+</html>

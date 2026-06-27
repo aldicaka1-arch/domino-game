@@ -1,0 +1,15 @@
+{
+  "name": "domino-game",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node server.js",
+    "test:four": "node test-four.js",
+    "test:match": "node test-match.js",
+    "test:solo": "node test-solo.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "ws": "^8.18.0"
+  }
+}
